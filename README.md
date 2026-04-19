@@ -385,30 +385,36 @@ This demonstrates the ability to balance rapid development with sound engineerin
 ## � Development Team
 
 **Ezequiel Ribke** - Frontend Developer (Flutter/Dart/UI)
+
 - Architecture and state management design
 - Game UI and custom design system
 - Real-time game screen implementation
 - Riverpod provider architecture
 
 **Mariano Backhaus** - QA & Testing
+
 - Manual testing and bug reporting
 - Game balance feedback
 - User experience validation
 - Feature refinement
 
-**Santiago Franco** - UI/UX Designer
+**Santiago Franco** - Frontend Designer & QA
+
 - Visual design and component styling
-- User interface layout
+- User interface layout and implementation
 - Animation and transition design
 - Theme and branding implementation
+- Testing and UX validation
 
 **Lucas Pasolli** - Backend Developer (Firebase)
+
 - Firebase Authentication setup
 - Firestore data modeling and security rules
 - Real-time database architecture
 - Server-side logic and game state persistence
 
 **Fatima Abigail Pereyra** - Backend Developer (Firestore)
+
 - Firestore collection structure
 - Data validation and serialization
 - Security rules implementation
@@ -425,4 +431,4 @@ Private portfolio project. Not for redistribution.
 ## 🎯 Repository
 
 **Live Portfolio:** https://github.com/ribkeeze/4-cartas-clean  
-*Built by a collaborative team in 6 hours during a hackathon.*
+_Built by a collaborative team in 6 hours during a hackathon._
