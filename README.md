@@ -384,27 +384,28 @@ This demonstrates the ability to balance rapid development with sound engineerin
 
 ## � Development Team
 
-**Ezequiel Ribke** - Frontend Developer (Flutter/Dart/UI)
+**Ezequiel Ribke** - Lead Frontend Developer (Flutter/Dart/UI)
 
-- Architecture and state management design
-- Game UI and custom design system
-- Real-time game screen implementation
-- Riverpod provider architecture
+- Core architecture and state management design
+- Heavy lifting on game UI development (custom design system, screens, components)
+- Real-time multiplayer game screen implementation
+- Riverpod provider architecture and optimization
+- Animation system and transitions
+- Theme implementation and design tokens
 
 **Mariano Backhaus** - QA & Testing
 
-- Manual testing and bug reporting
-- Game balance feedback
+- Additional game balance testing
 - User experience validation
-- Feature refinement
+- Feature refinement and edge case testing
 
-**Santiago Franco** - Frontend Designer & QA
+**Santiago Franco** - Frontend Developer Assistant & QA
 
-- Visual design and component styling
-- User interface layout and implementation
-- Animation and transition design
-- Theme and branding implementation
-- Testing and UX validation
+- Supporting UI/component implementation and refinement
+- Visual design collaboration and component styling
+- Animation and transition assistance
+- Comprehensive testing and UX validation
+- Bug reporting and feature feedback
 
 **Lucas Pasolli** - Backend Developer (Firebase)
 
