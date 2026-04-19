@@ -1,6 +1,6 @@
 # 4 Cartas - Real-Time Multiplayer Card Game
 
-A production-grade Flutter application demonstrating advanced mobile development practices, built in **6 hours** during a hackathon. Features real-time multiplayer gameplay, complex state management, and a custom design system.
+A production-grade Flutter application demonstrating advanced mobile development practices, built in **6 hours** during a hackathon by a collaborative team. Features real-time multiplayer gameplay, complex state management, custom design system, and comprehensive backend infrastructure.
 
 **Live Repository:** https://github.com/ribkeeze/4-cartas-clean
 
@@ -15,12 +15,14 @@ A production-grade Flutter application demonstrating advanced mobile development
 - **Game Engine**: Pure Dart business logic with comprehensive turn-based state machine
 - **Custom Design System**: Semantic tokens, typography scales, and animation presets
 - **Production Architecture**: Repository pattern, clean separation of concerns, scalable structure
+- **Planned Features**: Image uploads, Google OAuth, chat, lives system, ad monetization, dynamic skin theming
 
 ---
 
 ## 🏗️ Technical Highlights
 
 ### State Management with Riverpod
+
 - **Async Providers**: FutureProvider for Firebase data fetching with automatic caching
 - **Family Providers**: Parametrized providers for room-specific game state
 - **State Providers**: Local UI state management (coins, skins, player nicknames)
@@ -39,20 +41,23 @@ final addOwnedSkinProvider = FutureProvider.family<void, String>((ref, skinName)
 ```
 
 ### Game Engine Architecture
+
 - **Pure Dart Business Logic**: No Flutter dependencies, 100% testable
 - **State Reducer Pattern**: `GameState apply(GameState, GameAction) -> GameState`
-- **Turn-Based State Machine**: 
+- **Turn-Based State Machine**:
   - `peekInitial` → `turn` → `cardDrawn` → `power*` → `reveal`
 - **Complex Power Resolution**: 7-10 card powers with unique mechanics
 - **Mirror Mechanic**: Bluffing system with penalty calculation
 
 ### Real-Time Multiplayer
+
 - **Firestore Streams**: Live game state synchronization across devices
 - **Optimistic Updates**: Local state updates with sync confirmation
 - **Conflict Resolution**: Turn-based design eliminates race conditions
 - **Player Presence**: Room-based lobbies with seat assignment
 
 ### Firebase Integration
+
 - **Authentication**: Email/password + anonymous auth
 - **Firestore**: Denormalized game documents with subcollections
 - **Security Rules**: Row-level security ensuring players can only access their games
@@ -63,6 +68,7 @@ final addOwnedSkinProvider = FutureProvider.family<void, String>((ref, skinName)
 ## 🎨 Design System & UI
 
 ### Custom Design Tokens (3-Layer Architecture)
+
 ```dart
 // Primitive layer (raw colors)
 static const Color _midnight900 = Color(0xFF111826);
@@ -77,11 +83,13 @@ static const Color turnGlow = _electric500;
 ```
 
 ### Motion & Animation System
+
 - **Motion Presets**: Named animation timings and curves for consistency
 - **Interruptible Animations**: State-aware animation controllers
 - **Component Animations**: 320ms route transitions, 480ms card reveals, 120ms press feedback
 
 ### Typography Scale
+
 - **11 Responsive Styles**: From caption (12px) to hero (48px)
 - **Semantic Naming**: `label`, `titleSmall`, `bodyStrong` for clarity
 - **Letter Spacing**: Cyberpunk aesthetic with kerning hints
@@ -91,6 +99,7 @@ static const Color turnGlow = _electric500;
 ## 🎮 Game Features
 
 ### Gameplay Mechanics
+
 - **4-Card Hand**: Each player manages 4 face-down cards
 - **Turn System**: Draw, Swap, Discard, or Trigger Power
 - **Card Powers**: 7/8 (peek own), 9/10 (peek opponent), J/Q (swap), K (decide swap), Joker (wildcard)
@@ -99,6 +108,7 @@ static const Color turnGlow = _electric500;
 - **Scoring**: A=1, 2-10=face, J=11, Q=12, K=13, Joker=-2
 
 ### User Features
+
 - **Authentication**: Secure Firebase auth with display names
 - **Shop System**: 10 card skin packs purchasable with in-game coins
 - **Purchase History**: "Mis Compras" showing owned skins
@@ -153,14 +163,14 @@ lib/
 
 ### Key Design Decisions
 
-| Decision | Why |
-|----------|-----|
-| **Riverpod** | Type-safe provider composition, excellent for real-time streams |
-| **Pure Dart Engine** | Decoupled from UI, fully testable, can be reused on web/CLI |
-| **FireStore Streams** | Real-time by default, scales to thousands of concurrent rooms |
-| **Go Router** | Declarative routing with deep linking support |
-| **immutable Models** | Predictable state machine, easier debugging |
-| **Semantic Tokens** | Single source of truth for design, easy theme changes |
+| Decision              | Why                                                             |
+| --------------------- | --------------------------------------------------------------- |
+| **Riverpod**          | Type-safe provider composition, excellent for real-time streams |
+| **Pure Dart Engine**  | Decoupled from UI, fully testable, can be reused on web/CLI     |
+| **FireStore Streams** | Real-time by default, scales to thousands of concurrent rooms   |
+| **Go Router**         | Declarative routing with deep linking support                   |
+| **immutable Models**  | Predictable state machine, easier debugging                     |
+| **Semantic Tokens**   | Single source of truth for design, easy theme changes           |
 
 ---
 
@@ -211,6 +221,7 @@ flutter test
 ## 💡 Key Implementation Highlights
 
 ### 1. Real-Time Game Synchronization
+
 ```dart
 // Players see live state updates without manual refresh
 final roomStream = ref.watch(roomStreamProvider(roomCode));
@@ -218,6 +229,7 @@ final roomStream = ref.watch(roomStreamProvider(roomCode));
 ```
 
 ### 2. Complex State Derivation
+
 ```dart
 // Derived providers compose simple providers into complex state
 final isMyTurnProvider = Provider.family<bool, String>((ref, code) {
@@ -228,6 +240,7 @@ final isMyTurnProvider = Provider.family<bool, String>((ref, code) {
 ```
 
 ### 3. Immutable Game State
+
 ```dart
 // State reducer ensures deterministic transitions
 GameState apply(GameState state, GameAction action) {
@@ -243,6 +256,7 @@ GameState apply(GameState state, GameAction action) {
 ```
 
 ### 4. Optimized UI Performance
+
 - `autoDispose` providers prevent memory leaks
 - `ConsumerWidget` reduces rebuild scope
 - Animation controllers prevent jank
@@ -277,6 +291,7 @@ flutter analyze
 ```
 
 ### Notable Patterns Used
+
 - ✅ Repository pattern for data access
 - ✅ State reducer pattern (Redux-like)
 - ✅ Provider composition
@@ -304,21 +319,44 @@ Study this codebase to learn:
 ## 🚢 Production Readiness
 
 ### Implemented
+
 - ✅ Error handling with user feedback
-- ✅ Loading states for async operations  
+- ✅ Loading states for async operations
 - ✅ Secure authentication
 - ✅ Data validation
 - ✅ Firestore security rules
 - ✅ Offline awareness (streams)
+- ✅ Real user display names (Firebase)
+- ✅ Riverpod state caching for coins
+- ✅ Owned skins tracking and display
+- ✅ Shop system with purchase history
+
+### In Progress / Planned
+
+- 🔄 **Profile Picture Upload** - Image picker + Firestore Storage integration
+- 🔄 **Google Authentication** - OAuth 2.0 sign-in flow
+- 🔄 **Real-Time Opponent Names** - Display rival name in lobby and during game
+- 🔄 **Enhanced Game Context** - More feedback messages for better UX
+- 🔄 **Leave Game Notifications** - Alert opponent when player disconnects
+- 🔄 **Ad Monetization** - Double coins reward for watching ads
+- 🔄 **Lives System** - Daily lives with ad-based recharge (Candy Crush model)
+- 🔄 **Chat System** - Real-time messaging between players
+- 🔄 **Dynamic UI Skins** - Theme UI based on purchased card skins
+- 🔄 **Todo Management** - Task list for gameplay features
+- 🔄 **Performance Optimizations** - Image caching, lazy loading
 
 ### Future Improvements
+
 - [ ] Comprehensive unit/widget test suite
 - [ ] Player rankings and statistics
-- [ ] Chat messaging system
+- [ ] Seasonal battle pass system
 - [ ] Sound effects and haptic feedback
-- [ ] Analytics tracking
-- [ ] Performance monitoring
+- [ ] Analytics tracking (Firebase Analytics)
+- [ ] Performance monitoring (Crashlytics)
 - [ ] A/B testing infrastructure
+- [ ] Leaderboards with real-time updates
+- [ ] Replay system for recorded games
+- [ ] Tournament mode for groups
 
 ---
 
@@ -334,6 +372,7 @@ Study this codebase to learn:
 ## 🎖️ Hackathon Achievement
 
 **Built in 6 hours** with a focus on:
+
 - Production-quality architecture
 - Real-time multiplayer synchronization
 - Polished user experience
@@ -343,13 +382,47 @@ This demonstrates the ability to balance rapid development with sound engineerin
 
 ---
 
+## � Development Team
+
+**Ezequiel Ribke** - Frontend Developer (Flutter/Dart/UI)
+- Architecture and state management design
+- Game UI and custom design system
+- Real-time game screen implementation
+- Riverpod provider architecture
+
+**Mariano Backhaus** - QA & Testing
+- Manual testing and bug reporting
+- Game balance feedback
+- User experience validation
+- Feature refinement
+
+**Santiago Franco** - UI/UX Designer
+- Visual design and component styling
+- User interface layout
+- Animation and transition design
+- Theme and branding implementation
+
+**Lucas Pasolli** - Backend Developer (Firebase)
+- Firebase Authentication setup
+- Firestore data modeling and security rules
+- Real-time database architecture
+- Server-side logic and game state persistence
+
+**Fatima Abigail Pereyra** - Backend Developer (Firestore)
+- Firestore collection structure
+- Data validation and serialization
+- Security rules implementation
+- Performance optimization for real-time queries
+
+---
+
 ## 📄 License
 
 Private portfolio project. Not for redistribution.
 
 ---
 
-## 👤 Author
+## 🎯 Repository
 
-**Ezequiel Ribke** - Full Stack Flutter Developer  
-*Portfolio: [4 Cartas](https://github.com/ribkeeze/4-cartas-clean)*
+**Live Portfolio:** https://github.com/ribkeeze/4-cartas-clean  
+*Built by a collaborative team in 6 hours during a hackathon.*
