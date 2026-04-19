@@ -325,22 +325,88 @@ class _SignOutButton extends StatelessWidget {
 
 // ─── Mis Compras Sheet ────────────────────────────────────────────────────────
 
-class _MisComprasSheet extends StatelessWidget {
+class _MisComprasSheet extends ConsumerWidget {
   const _MisComprasSheet();
 
-  static const _ownedPacks = [
-    _OwnedPack(
+  // Map of all available packs with their styling
+  static const _allPacks = {
+    'CARTAS NEON': _OwnedPack(
+      name: 'CARTAS NEON',
+      description: 'Brillan en la oscuridad.',
+      cardColor: Color(0xFF0D1B3E),
+      accentColor: Color(0xFF4DA3FF),
+      borderColor: Color(0xFF4DA3FF),
+    ),
+    'CARTAS SCALONETA': _OwnedPack(
       name: 'CARTAS SCALONETA',
-      description: 'Con la celeste y blanca. Campeones del mundo.',
+      description: 'Campeones del mundo.',
       cardColor: Color(0xFF0A2A4A),
       accentColor: Color(0xFF75AADB),
       borderColor: Color(0xFFFFFFFF),
     ),
-  ];
+    'BRAINROT': _OwnedPack(
+      name: 'BRAINROT',
+      description: 'Meme, caos, exagerado.',
+      cardColor: Color(0xFF1A0A2E),
+      accentColor: Color(0xFFA8FF3E),
+      borderColor: Color(0xFFFF3EA8),
+    ),
+    'GRAFFITI CLASH': _OwnedPack(
+      name: 'GRAFFITI CLASH',
+      description: 'Callejero, urbano, explosivo.',
+      cardColor: Color(0xFF1A1000),
+      accentColor: Color(0xFFFF6B00),
+      borderColor: Color(0xFFFF6B00),
+    ),
+    'BLACK GOLD': _OwnedPack(
+      name: 'BLACK GOLD',
+      description: 'Elegante, premium, sobrio.',
+      cardColor: Color(0xFF0A0A0A),
+      accentColor: Color(0xFFF5B642),
+      borderColor: Color(0xFFF5B642),
+    ),
+    'FROZEN ACE': _OwnedPack(
+      name: 'FROZEN ACE',
+      description: 'Hielo, azul, blanco, fino.',
+      cardColor: Color(0xFF0A1F2E),
+      accentColor: Color(0xFFB8E8FF),
+      borderColor: Color(0xFFE0F4FF),
+    ),
+    'INFERNO': _OwnedPack(
+      name: 'INFERNO',
+      description: 'Fuego, rojo, energía.',
+      cardColor: Color(0xFF1F0500),
+      accentColor: Color(0xFFFF4500),
+      borderColor: Color(0xFFFF6B00),
+    ),
+    'VAPORWAVE': _OwnedPack(
+      name: 'VAPORWAVE',
+      description: 'Rosa, celeste, retro digital.',
+      cardColor: Color(0xFF1A0A2E),
+      accentColor: Color(0xFFFF6EC7),
+      borderColor: Color(0xFF6EC6FF),
+    ),
+    'PIXEL RUSH': _OwnedPack(
+      name: 'PIXEL RUSH',
+      description: 'Estilo arcade/8-bit.',
+      cardColor: Color(0xFF050F05),
+      accentColor: Color(0xFF00FF41),
+      borderColor: Color(0xFF00FF41),
+    ),
+    'GALAXIA': _OwnedPack(
+      name: 'GALAXIA',
+      description: 'Espacio, estrellas, violeta.',
+      cardColor: Color(0xFF050010),
+      accentColor: Color(0xFF9D4EDD),
+      borderColor: Color(0xFF6A0DAD),
+    ),
+  };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ownedSkinsAsync = ref.watch(userOwnedSkinsProvider);
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surfaceElevated,
@@ -353,30 +419,85 @@ class _MisComprasSheet extends StatelessWidget {
         AppSpacing.base,
         AppSpacing.xl + bottomPadding,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.border,
-                borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: ownedSkinsAsync.when(
+        data: (ownedSkins) {
+          final ownedPacks = ownedSkins
+              .map((name) => _allPacks[name])
+              .whereType<_OwnedPack>()
+              .toList();
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Text('MIS COMPRAS', style: AppText.title.copyWith(letterSpacing: 1)),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                ownedPacks.isEmpty
+                    ? 'No tienes compras aún'
+                    : '${ownedPacks.length} paquete${ownedPacks.length == 1 ? '' : 's'} comprado${ownedPacks.length == 1 ? '' : 's'}',
+                style: AppText.body.copyWith(color: AppColors.textSecondary),
+              ),
+              if (ownedPacks.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.xl),
+                ...ownedPacks.map((pack) => _OwnedPackRow(pack: pack)),
+              ] else
+                const SizedBox(height: AppSpacing.xl),
+            ],
+          );
+        },
+        loading: () => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Text('MIS COMPRAS', style: AppText.title.copyWith(letterSpacing: 1)),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            '${_ownedPacks.length} paquete${_ownedPacks.length == 1 ? '' : 's'} comprado${_ownedPacks.length == 1 ? '' : 's'}',
-            style: AppText.body.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          ..._ownedPacks.map((pack) => _OwnedPackRow(pack: pack)),
-        ],
+            const SizedBox(height: AppSpacing.xl),
+            Text('MIS COMPRAS', style: AppText.title.copyWith(letterSpacing: 1)),
+            const SizedBox(height: AppSpacing.xl),
+            const CircularProgressIndicator(),
+          ],
+        ),
+        error: (_, __) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Text('MIS COMPRAS', style: AppText.title.copyWith(letterSpacing: 1)),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              'Error cargando compras',
+              style: AppText.body.copyWith(color: AppColors.danger),
+            ),
+          ],
+        ),
       ),
     );
   }

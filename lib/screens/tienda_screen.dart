@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/design_tokens.dart';
 import '../core/typography.dart';
+import '../state/providers.dart';
 
 // ─── Coin Offer Model ─────────────────────────────────────────────────────────
 
@@ -142,39 +144,44 @@ const _packs = [
 
 // ─── Tienda Screen ────────────────────────────────────────────────────────────
 
-class TiendaScreen extends StatefulWidget {
+class TiendaScreen extends ConsumerWidget {
   const TiendaScreen({super.key});
 
-  @override
-  State<TiendaScreen> createState() => _TiendaScreenState();
-}
-
-class _TiendaScreenState extends State<TiendaScreen> {
-  int _coins = 100;
-  final Set<String> _ownedPacks = {};
-
-  void _handleBuyPack(BuildContext context, _Pack pack) {
-    if (_coins >= pack.price) {
-      setState(() {
-        _coins -= pack.price;
-        _ownedPacks.add(pack.name);
-      });
-      showDialog(
-        context: context,
-        builder: (_) => _PurchaseSuccessDialog(pack: pack),
-      );
+  Future<void> _handleBuyPack(
+    BuildContext context,
+    WidgetRef ref,
+    _Pack pack,
+    int currentCoins,
+  ) async {
+    if (currentCoins >= pack.price) {
+      final newCoins = currentCoins - pack.price;
+      // Update coins in Firestore
+      await ref.read(updateCoinsProvider(newCoins).future);
+      // Add the skin to owned skins
+      await ref.read(addOwnedSkinProvider(pack.name).future);
+      
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => _PurchaseSuccessDialog(pack: pack),
+        );
+      }
     } else {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) => const _BuyCoinsSheet(),
-      );
+      if (context.mounted) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const _BuyCoinsSheet(),
+        );
+      }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coinsAsync = ref.watch(userCoinsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.bgDeepest,
       appBar: AppBar(
@@ -192,7 +199,20 @@ class _TiendaScreenState extends State<TiendaScreen> {
           ),
         ),
         actions: [
-          _CoinsWidget(amount: _coins),
+          coinsAsync.when(
+            data: (coins) => _CoinsWidget(amount: coins),
+            loading: () => const SizedBox(
+              width: 100,
+              child: Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+            error: (_, __) => _CoinsWidget(amount: 0),
+          ),
           const SizedBox(width: AppSpacing.base),
         ],
       ),
@@ -206,26 +226,69 @@ class _TiendaScreenState extends State<TiendaScreen> {
             colors: [AppColors.bgBase, AppColors.bgDeepest],
           ),
         ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.base),
-            children: [
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'SKINS DE CARTAS',
-                style: AppText.label.copyWith(letterSpacing: 2),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ..._packs.map((pack) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.base),
-                    child: _PackCard(
-                      pack: pack,
-                      ownedCoins: _coins,
-                      isOwned: _ownedPacks.contains(pack.name),
-                      onBuy: () => _handleBuyPack(context, pack),
+        child: coinsAsync.when(
+          data: (coins) {
+            final skinsAsync = ref.watch(userOwnedSkinsProvider);
+            return skinsAsync.when(
+              data: (ownedSkins) => SafeArea(
+                child: ListView(
+                  padding: const EdgeInsets.all(AppSpacing.base),
+                  children: [
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'SKINS DE CARTAS',
+                      style: AppText.label.copyWith(letterSpacing: 2),
                     ),
-                  )),
-            ],
+                    const SizedBox(height: AppSpacing.md),
+                    ..._packs.map((pack) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.base),
+                          child: _PackCard(
+                            pack: pack,
+                            ownedCoins: coins,
+                            isOwned: ownedSkins.contains(pack.name),
+                            onBuy: () =>
+                                _handleBuyPack(context, ref, pack, coins),
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (_, __) => SafeArea(
+                child: ListView(
+                  padding: const EdgeInsets.all(AppSpacing.base),
+                  children: [
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'SKINS DE CARTAS',
+                      style: AppText.label.copyWith(letterSpacing: 2),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ..._packs.map((pack) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.base),
+                          child: _PackCard(
+                            pack: pack,
+                            ownedCoins: coins,
+                            isOwned: false,
+                            onBuy: () =>
+                                _handleBuyPack(context, ref, pack, coins),
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          error: (err, stack) => Center(
+            child: Text(
+              'Error: $err',
+              style: AppText.body.copyWith(color: AppColors.danger),
+            ),
           ),
         ),
       ),

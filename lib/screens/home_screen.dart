@@ -15,9 +15,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // TODO: replace with real user from backend
-  static const _mockNickname = 'lucas';
-
   bool _busy = false;
   String? _busyError;
 
@@ -38,10 +35,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _onCrear() async {
     await _withBusy(() async {
       final uid = await ref.read(currentUserIdProvider.future);
+      final user = await ref.read(currentUserProvider.future);
+      final nickname = user?.displayName ?? 'Jugador';
       final room = await ref
           .read(roomRepositoryProvider)
-          .createRoom(hostUid: uid, hostNickname: _mockNickname);
-      ref.read(nicknameProvider.notifier).state = _mockNickname;
+          .createRoom(hostUid: uid, hostNickname: nickname);
+      ref.read(nicknameProvider.notifier).state = nickname;
       if (mounted) context.go('/lobby/${room.roomCode}');
     });
   }
@@ -52,17 +51,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _JoinSheet(
-        nickname: _mockNickname,
         onJoin: (code) async {
-          await _joinByCode(_mockNickname, code);
+          await _joinByCode(code);
         },
       ),
     );
   }
 
-  Future<void> _joinByCode(String nickname, String code) async {
+  Future<void> _joinByCode(String code) async {
     await _withBusy(() async {
       final uid = await ref.read(currentUserIdProvider.future);
+      final user = await ref.read(currentUserProvider.future);
+      final nickname = user?.displayName ?? 'Jugador';
       await ref.read(roomRepositoryProvider).joinRoom(
             code: code,
             uid: uid,
@@ -162,9 +162,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 // ─── Join Sheet ───────────────────────────────────────────────────────────────
 
 class _JoinSheet extends StatefulWidget {
-  final String nickname;
   final Future<void> Function(String code) onJoin;
-  const _JoinSheet({required this.nickname, required this.onJoin});
+  const _JoinSheet({required this.onJoin});
 
   @override
   State<_JoinSheet> createState() => _JoinSheetState();
